@@ -8,6 +8,7 @@ tar_target(
   name,
   command,
   pattern = NULL,
+  accumulate = FALSE,
   tidy_eval = targets::tar_option_get("tidy_eval"),
   packages = targets::tar_option_get("packages"),
   library = targets::tar_option_get("library"),
@@ -50,6 +51,9 @@ For example, in a pipeline with numeric vector targets \code{x} and \code{y},
 \code{tar_target(z, x + y, pattern = map(x, y))} implicitly defines
 branches of \code{z} that each compute \code{x[1] + y[1]}, \code{x[2] + y[2]},
 and so on. See the user manual for details.}
+
+\item{accumulate}{Logical, whether to feed the results generated from
+the previous branch into the next branch.}
 
 \item{tidy_eval}{Logical, whether to enable tidy evaluation
 when interpreting \code{command} and \code{pattern}. If \code{TRUE}, you can use the

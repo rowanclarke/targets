@@ -8,6 +8,7 @@ tar_target_raw(
   name,
   command,
   pattern = NULL,
+  accumulate = FALSE,
   packages = targets::tar_option_get("packages"),
   library = targets::tar_option_get("library"),
   deps = NULL,
@@ -53,6 +54,9 @@ informally quoted code.
 except the object must already be an expression instead of
 informally quoted code.
 \code{base::expression()} and \code{base::quote()} can produce such objects.}
+
+\item{accumulate}{Logical, whether to feed the results generated from
+the previous branch into the next branch.}
 
 \item{packages}{Character vector of packages to load right before
 the target runs or the output data is reloaded for

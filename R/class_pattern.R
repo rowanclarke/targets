@@ -101,16 +101,9 @@ target_is_branchable.tar_pattern <- function(target) {
 
 #' @export
 target_produce_junction.tar_pattern <- function(target, pipeline) {
-  dimensions <- target$settings$dimensions
-  pattern_tar_assert_dimensions(target, dimensions, pipeline)
-  siblings <- setdiff(target_deps_shallow(target, pipeline), dimensions)
-  niblings <- pattern_children_columns(dimensions, pipeline)
-  pattern <- target$settings$pattern
-  niblings <- pattern_produce_grid(pattern, niblings, target$command$seed)
-  all_deps <- pattern_combine_niblings_siblings(niblings, siblings)
-  nibling_deps <- all_deps[, dimensions, drop = FALSE]
-  names <- pattern_name_branches(target_get_parent(target), nibling_deps)
-  junction_init(target_get_parent(target), names, all_deps)
+  deps <- pattern_get_deps(target, pipeline)
+  names <- pattern_name_branches(target_get_parent(target), deps$nibling)
+  junction_init(target_get_parent(target), names, deps$all)
 }
 
 #' @export
@@ -213,6 +206,10 @@ pattern_produce_branch <- function(spec, command, settings, cue) {
 }
 
 pattern_produce_branches <- function(target, pipeline) {
+  UseMethod("pattern_produce_branches")
+}
+
+pattern_produce_branches.tar_pattern <- function(target, pipeline) {
   map(
     junction_transpose(target$junction),
     pattern_produce_branch,
@@ -336,6 +333,18 @@ pattern_debug_branches <- function(target) {
     tar_option_set(debug = c(debug, target_get_children(target)))
     # nocov end
   }
+}
+
+pattern_get_deps <- function(target, pipeline) {
+  dimensions <- target$settings$dimensions
+  pattern_tar_assert_dimensions(target, dimensions, pipeline)
+  siblings <- setdiff(target_deps_shallow(target, pipeline), dimensions)
+  niblings <- pattern_children_columns(dimensions, pipeline)
+  pattern <- target$settings$pattern
+  niblings <- pattern_produce_grid(pattern, niblings, target$command$seed)
+  all <- pattern_combine_niblings_siblings(niblings, siblings)
+  nibling <- all[, dimensions, drop = FALSE]
+  list(all = all, nibling = nibling)
 }
 
 pattern_children_columns <- function(dimensions, pipeline) {

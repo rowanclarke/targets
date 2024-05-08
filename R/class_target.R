@@ -1,6 +1,7 @@
 target_init <- function(
   name = character(0),
   expr = NULL,
+  accumulate = FALSE,
   packages = (.packages()),
   library = NULL,
   deps = NULL,
@@ -51,21 +52,28 @@ target_init <- function(
   )
   command$deps <- unique(c(command$deps, settings$dimensions))
   command$deps <- setdiff(command$deps, name)
-  if_any(
-    is.null(settings$pattern),
+  if (is.null(settings$pattern)) {
     stem_new(
       command,
       settings,
       cue,
       store = settings_produce_store(settings)
-    ),
+    )
+  } else if (!accumulate) {
     pattern_new(
       command,
       settings,
       cue,
       patternview = patternview_init()
     )
-  )
+  } else {
+    accumulate_new(
+      command,
+      settings,
+      cue,
+      patternview = patternview_init()
+    )
+  }
 }
 
 target_new <- function(
